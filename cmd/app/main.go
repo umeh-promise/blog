@@ -3,6 +3,7 @@ package main
 import (
 	_ "github.com/lib/pq"
 	"github.com/umeh-promise/blog/internal/controller/handlers"
+	"github.com/umeh-promise/blog/internal/controller/middlewares"
 	"github.com/umeh-promise/blog/internal/controller/routes"
 	"github.com/umeh-promise/blog/internal/db"
 	"github.com/umeh-promise/blog/internal/repositories"
@@ -36,6 +37,7 @@ func main() {
 	postRepo := repositories.NewPostRepository(db)
 	postService := services.NewPostService(postRepo)
 	postHandler := handlers.NewUserHandler(postService)
+	postMiddleware := middlewares.NewPostMidleware(postService)
 
 	app := &application{
 		config: config,
@@ -43,7 +45,7 @@ func main() {
 	}
 
 	router := app.mount(
-		routes.PostRouter(postHandler),
+		routes.PostRouter(postHandler, postMiddleware),
 	)
 	logger.Fatal(app.run(router))
 }
