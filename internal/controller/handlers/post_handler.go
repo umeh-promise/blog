@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/umeh-promise/blog/internal/controller/middlewares"
 	"github.com/umeh-promise/blog/internal/models"
 	"github.com/umeh-promise/blog/internal/services"
 	"github.com/umeh-promise/blog/internal/utils"
@@ -62,24 +63,8 @@ func (handler *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	if err != nil {
-		utils.BadRequestError(w, r, err)
-		return
-	}
 
-	ctx := r.Context()
-
-	post, err := handler.Service.GetByID(ctx, id)
-	if err != nil {
-		switch err {
-		case utils.ErrorNotFound:
-			utils.NotFoundResponse(w, r, err)
-		default:
-			utils.InternalServerError(w, r, err)
-		}
-		return
-	}
+	post := middlewares.GetPostFromContext(r)
 
 	if err := utils.JSONResponse(w, http.StatusOK, post); err != nil {
 		utils.InternalServerError(w, r, err)
@@ -96,11 +81,8 @@ type UpdatePostPayload struct {
 
 func (handler *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	var payload UpdatePostPayload
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	if err != nil {
-		utils.BadRequestError(w, r, err)
-		return
-	}
+
+	post := middlewares.GetPostFromContext(r)
 
 	if err := utils.ReadJSON(w, r, &payload); err != nil {
 		utils.BadRequestError(w, r, err)
@@ -114,12 +96,6 @@ func (handler *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
-	post, err := handler.Service.Repo.GetByID(ctx, id)
-	if err != nil {
-		utils.NotFoundResponse(w, r, err)
-		return
-	}
-
 	if payload.Title != nil {
 		post.Title = *payload.Title
 	}
@@ -130,7 +106,7 @@ func (handler *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 		post.Tags = *payload.Tags
 	}
 
-	if err := handler.Service.Repo.Update(ctx, post); err != nil {
+	if err := handler.Service.Update(ctx, post); err != nil {
 		utils.BadRequestError(w, r, err)
 		return
 	}
@@ -148,12 +124,26 @@ func (handler *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := handler.Service.Repo.Delete(r.Context(), id); err != nil {
+	if err := handler.Service.Delete(r.Context(), id); err != nil {
 		utils.InternalServerError(w, r, err)
 		return
 	}
 
 	if err := utils.JSONResponse(w, http.StatusNoContent, nil); err != nil {
 		utils.InternalServerError(w, r, err)
+		return
+	}
+}
+
+func (handler *PostHandler) GetAllPost(w http.ResponseWriter, r *http.Request) {
+	posts, err := handler.Service.GetAll(r.Context())
+	if err != nil {
+		utils.NotFoundResponse(w, r, err)
+		return
+	}
+
+	if err := utils.JSONResponse(w, http.StatusOK, posts); err != nil {
+		utils.InternalServerError(w, r, err)
+		return
 	}
 }
