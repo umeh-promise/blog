@@ -12,4 +12,5 @@ type Posts interface {
 	// GetByEmail(context.Context, string) (*models.Post, error)
 	Update(context.Context, *models.Post) error
 	Delete(context.Context, int64) error
+	GetAll(context.Context) ([]models.Post, error)
 }

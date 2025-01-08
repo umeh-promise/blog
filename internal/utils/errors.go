@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	ErrorNotFound = errors.New("resource not found")
-	logger        = zap.Must(zap.NewProduction()).Sugar()
+	ErrorNotFound  = errors.New("resource not found")
+	ErrorInvalidID = errors.New("invalid post id")
+	logger         = zap.Must(zap.NewProduction()).Sugar()
 )
 
 func InternalServerError(w http.ResponseWriter, r *http.Request, err error) {

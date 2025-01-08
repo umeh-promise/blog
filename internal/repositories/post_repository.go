@@ -73,6 +73,32 @@ func (postRepo *PostRepository) GetByID(ctx context.Context, id int64) (*models.
 	return &post, nil
 }
 
+func (repo *PostRepository) GetAll(ctx context.Context) ([]models.Post, error) {
+	query := `
+		SELECT id, user_id, title, content, tags, version, created_at, updated_at FROM posts
+	`
+
+	rows, err := repo.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+
+	for rows.Next() {
+		post := models.Post{}
+		err := rows.Scan(&post.ID, &post.UserID, &post.Title, &post.Content, pq.Array(&post.Tags), &post.Version, &post.CratedAt, &post.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
 // func (postRepo *PostRepository) GetByEmail(ctx context.Context, email string) (*models.Post, error) {
 // 	var post models.Post
 
