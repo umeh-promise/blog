@@ -1,8 +1,13 @@
 package utils
 
 import (
+	"errors"
 	"log"
 	"net/http"
+)
+
+var (
+	ErrorNotFound = errors.New("resource not found")
 )
 
 func InternalServerError(w http.ResponseWriter, r *http.Request, err error) {
