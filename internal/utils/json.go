@@ -30,15 +30,17 @@ func ReadJSON(w http.ResponseWriter, r *http.Request, data interface{}) error {
 	return decoder.Decode(data)
 }
 
-func WriteJSONError(w http.ResponseWriter, statusCode int, message string) error {
+func WriteJSONError(w http.ResponseWriter, status int, error []string, message string) error {
 	type envelop struct {
-		Status string `json:"status"`
-		Error  string `json:"error"`
+		Status  string   `json:"status"`
+		Error   []string `json:"error"`
+		Message string   `json:"message"`
 	}
 
-	return WriteJSON(w, statusCode, &envelop{
-		Status: "failed",
-		Error:  message,
+	return WriteJSON(w, status, &envelop{
+		Status:  "failed",
+		Error:   error,
+		Message: message,
 	})
 }
 

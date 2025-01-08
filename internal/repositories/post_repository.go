@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/lib/pq"
 	"github.com/umeh-promise/blog/internal/interfaces"
@@ -19,7 +20,10 @@ func NewPostRepository(db *sql.DB) interfaces.Posts {
 }
 
 func (postRepo *PostRepository) Create(ctx context.Context, post *models.Post) error {
-	query := `INSERT INTO posts (user_id, title, content, tags) VALUES($1, $2, $3, $4) RETURNING id, created_at, updated_at`
+	query := `
+		INSERT INTO posts (user_id, title, content, tags) 
+		VALUES ($1, $2, $3, $4) RETURNING id, created_at, updated_at
+	`
 
 	ctx, cancel := context.WithTimeout(ctx, utils.QueryTimeout)
 	defer cancel()
@@ -41,8 +45,7 @@ func (postRepo *PostRepository) GetByID(ctx context.Context, id int64) (*models.
 
 	var post models.Post
 
-	query := `SELECT id, user_id, title, content, tags, version, created_at, updated_at FROM posts
-					WHERE id=$1`
+	query := `SELECT id, user_id, title, content, tags, version, created_at, updated_at FROM posts WHERE id=$1`
 
 	ctx, cancel := context.WithTimeout(ctx, utils.QueryTimeout)
 	defer cancel()
@@ -59,8 +62,8 @@ func (postRepo *PostRepository) GetByID(ctx context.Context, id int64) (*models.
 	)
 
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
 			return nil, utils.ErrorNotFound
 		default:
 			return nil, err
@@ -68,4 +71,82 @@ func (postRepo *PostRepository) GetByID(ctx context.Context, id int64) (*models.
 	}
 
 	return &post, nil
+}
+
+// func (postRepo *PostRepository) GetByEmail(ctx context.Context, email string) (*models.Post, error) {
+// 	var post models.Post
+
+// 	query := `SELECT id, user_id, title, content, tags, version, created_at, updated_at FROM posts WHERE email=$1`
+
+// 	ctx, cancel := context.WithTimeout(ctx, utils.QueryTimeout)
+// 	defer cancel()
+
+// 	err := postRepo.db.QueryRowContext(ctx, query, email).Scan(
+// 		&post.ID,
+// 		&post.UserID,
+// 		&post.Title,
+// 		&post.Content,
+// 		pq.Array(&post.Tags),
+// 		&post.Version,
+// 		&post.CratedAt,
+// 		&post.UpdatedAt,
+// 	)
+
+// 	if err != nil {
+// 		switch {
+// 		case errors.Is(err, sql.ErrNoRows):
+// 			return nil, utils.ErrorNotFound
+// 		default:
+// 			return nil, err
+// 		}
+// 	}
+
+// 	return &post, nil
+// }
+
+func (postRepo *PostRepository) Update(ctx context.Context, post *models.Post) error {
+	query := `
+		UPDATE posts 
+		SET title = $1, content = $2, tags = $3, version = version + 1
+		WHERE id = $4 AND version = $5
+		RETURNING version
+	`
+	ctx, cancel := context.WithTimeout(ctx, utils.QueryTimeout)
+	defer cancel()
+
+	err := postRepo.db.QueryRowContext(ctx, query, post.Title, post.Content, pq.Array(post.Tags), post.ID, post.Version).Scan(&post.Version)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return utils.ErrorNotFound
+		default:
+			return err
+		}
+	}
+	return nil
+}
+
+func (postRepo *PostRepository) Delete(ctx context.Context, id int64) error {
+	query := `
+		DELETE FROM posts
+		WHERE id = $1	
+	`
+	ctx, cancel := context.WithTimeout(ctx, utils.QueryTimeout)
+	defer cancel()
+
+	rows, err := postRepo.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	row, err := rows.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if row < 1 {
+		return utils.ErrorNotFound
+	}
+
+	return nil
 }

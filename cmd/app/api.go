@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/umeh-promise/blog/internal/utils"
 )
 
 func (app *application) mount(routerGroups ...func(r chi.Router)) *chi.Mux {
@@ -52,11 +53,10 @@ func (app *application) run(handler *chi.Mux) error {
 
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), utils.QueryTimeout)
 		defer cancel()
 
 		log.Printf("Server signal %s caught", s.String())
-
 		shutdown <- server.Shutdown(ctx)
 	}()
 

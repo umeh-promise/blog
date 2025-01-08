@@ -2,22 +2,41 @@ package utils
 
 import (
 	"errors"
-	"log"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 var (
 	ErrorNotFound = errors.New("resource not found")
+	logger        = zap.Must(zap.NewProduction()).Sugar()
 )
 
 func InternalServerError(w http.ResponseWriter, r *http.Request, err error) {
-	log.Fatal("internal server error", err)
+	logger.Errorw("internal server error",
+		"method", r.Method,
+		"path", r.URL.Path,
+		"error", err.Error())
 
-	WriteJSONError(w, http.StatusInternalServerError, "The server encountered a problem")
+	WriteJSONError(w, http.StatusInternalServerError, []string{}, "The server encountered a problem")
 }
 
 func BadRequestError(w http.ResponseWriter, r *http.Request, err error) {
-	log.Fatal("bad request", err)
+	logger.Errorw("bad request",
+		"method", r.Method,
+		"path", r.URL.Path,
+		"error", err.Error())
 
-	WriteJSONError(w, http.StatusBadRequest, err.Error())
+	errors := []string{err.Error()}
+
+	WriteJSONError(w, http.StatusBadRequest, errors, "validation errors")
+}
+
+func NotFoundResponse(w http.ResponseWriter, r *http.Request, err error) {
+	logger.Errorw("not found error",
+		"method", r.Method,
+		"path", r.URL.Path,
+		"error", err.Error())
+
+	WriteJSONError(w, http.StatusNotFound, []string{}, "not found")
 }

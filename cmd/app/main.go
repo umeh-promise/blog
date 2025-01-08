@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	_ "github.com/lib/pq"
 	"github.com/umeh-promise/blog/internal/controller/handlers"
 	"github.com/umeh-promise/blog/internal/controller/routes"
@@ -10,6 +8,7 @@ import (
 	"github.com/umeh-promise/blog/internal/repositories"
 	"github.com/umeh-promise/blog/internal/services"
 	"github.com/umeh-promise/blog/internal/utils"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -24,12 +23,15 @@ func main() {
 		},
 	}
 
+	logger := zap.Must(zap.NewProduction()).Sugar()
+	defer logger.Sync()
+
 	db, err := db.NewDBConnection(config.db.addr, config.db.maxOpenConn, config.db.maxIdleConn, config.db.maxIdleTime)
 	if err != nil {
-		log.Fatal("failed to open database connection %w", err)
+		logger.Fatal("failed to open database connection %w", err)
 	}
 	defer db.Close()
-	log.Println("DB connected successfully")
+	logger.Info("DB connected successfully")
 
 	postRepo := repositories.NewPostRepository(db)
 	postService := services.NewPostService(postRepo)
@@ -37,11 +39,11 @@ func main() {
 
 	app := &application{
 		config: config,
+		logger: logger,
 	}
 
 	router := app.mount(
 		routes.PostRouter(postHandler),
 	)
-	log.Fatal(app.run(router))
-
+	logger.Fatal(app.run(router))
 }

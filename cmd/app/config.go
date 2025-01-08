@@ -1,7 +1,10 @@
 package main
 
+import "go.uber.org/zap"
+
 type application struct {
 	config baseConfig
+	logger *zap.SugaredLogger
 }
 
 type baseConfig struct {

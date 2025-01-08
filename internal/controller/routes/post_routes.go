@@ -7,6 +7,13 @@ import (
 
 func PostRouter(postHandler *handlers.PostHandler) func(r chi.Router) {
 	return func(r chi.Router) {
-		r.Get("/posts", postHandler.CreatePost)
+		r.Route("/posts", func(r chi.Router) {
+			r.Post("/", postHandler.CreatePost)
+			r.Route("/{id}", func(r chi.Router) {
+				r.Get("/", postHandler.GetPostByID)
+				r.Put("/", postHandler.UpdatePost)
+				r.Delete("/", postHandler.DeletePost)
+			})
+		})
 	}
 }
