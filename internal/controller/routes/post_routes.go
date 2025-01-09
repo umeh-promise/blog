@@ -6,7 +6,13 @@ import (
 	"github.com/umeh-promise/blog/internal/controller/middlewares"
 )
 
-func PostRouter(postHandler *handlers.PostHandler, postMiddleware *middlewares.PostMiddleware, authMiddleware *middlewares.AuthMiddleware, roleMiddleware *middlewares.RoleMiddleware) func(r chi.Router) {
+func PostRouter(
+	postHandler *handlers.PostHandler,
+	commentHandler *handlers.CommentHandler,
+	postMiddleware *middlewares.PostMiddleware,
+	authMiddleware *middlewares.AuthMiddleware,
+	roleMiddleware *middlewares.RoleMiddleware,
+) func(r chi.Router) {
 	return func(r chi.Router) {
 		r.Route("/posts", func(r chi.Router) {
 			r.Get("/", postHandler.GetAllPost)
@@ -20,6 +26,7 @@ func PostRouter(postHandler *handlers.PostHandler, postMiddleware *middlewares.P
 					r.Use(authMiddleware.AuthTokenMiddleware)
 					r.Put("/", roleMiddleware.CheckPostOwnership("moderator", postHandler.UpdatePost))
 					r.Delete("/", roleMiddleware.CheckPostOwnership("admin", postHandler.DeletePost))
+					r.Post("/comments", commentHandler.AddComment)
 				})
 			})
 		})

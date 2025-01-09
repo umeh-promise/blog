@@ -30,7 +30,7 @@ func (postRepo *PostRepository) Create(ctx context.Context, post *models.Post) e
 
 	err := postRepo.db.QueryRowContext(ctx, query, post.UserID, post.Title, post.Content, pq.Array(post.Tags)).Scan(
 		&post.ID,
-		&post.CratedAt,
+		&post.CreatedAt,
 		&post.UpdatedAt,
 	)
 
@@ -57,7 +57,7 @@ func (postRepo *PostRepository) GetByID(ctx context.Context, id int64) (*models.
 		&post.Content,
 		pq.Array(&post.Tags),
 		&post.Version,
-		&post.CratedAt,
+		&post.CreatedAt,
 		&post.UpdatedAt,
 	)
 
@@ -88,7 +88,7 @@ func (repo *PostRepository) GetAll(ctx context.Context) ([]models.Post, error) {
 
 	for rows.Next() {
 		post := models.Post{}
-		err := rows.Scan(&post.ID, &post.UserID, &post.Title, &post.Content, pq.Array(&post.Tags), &post.Version, &post.CratedAt, &post.UpdatedAt)
+		err := rows.Scan(&post.ID, &post.UserID, &post.Title, &post.Content, pq.Array(&post.Tags), &post.Version, &post.CreatedAt, &post.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}

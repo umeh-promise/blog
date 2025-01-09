@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,12 +13,14 @@ import (
 )
 
 type PostHandler struct {
-	Service *services.PostService
+	Service        *services.PostService
+	CommentService *services.CommentService
 }
 
-func NewPostHandler(service *services.PostService) *PostHandler {
+func NewPostHandler(service *services.PostService, commentService *services.CommentService) *PostHandler {
 	return &PostHandler{
-		Service: service,
+		Service:        service,
+		CommentService: commentService,
 	}
 }
 
@@ -65,6 +68,15 @@ func (handler *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 func (handler *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 
 	post := middlewares.GetPostFromContext(r)
+	comments, err := handler.CommentService.GetCommentByPostID(r.Context(), post.ID)
+	if err != nil {
+		utils.InternalServerError(w, r, err)
+		return
+	}
+
+	post.Comments = comments
+
+	fmt.Println(post.ID)
 
 	if err := utils.JSONResponse(w, http.StatusOK, post); err != nil {
 		utils.InternalServerError(w, r, err)
