@@ -95,6 +95,11 @@ func (handler *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	var payload UpdatePostPayload
 
 	post := middlewares.GetPostFromContext(r)
+	comments, err := handler.CommentService.GetCommentByPostID(r.Context(), post.ID)
+	if err != nil {
+		utils.InternalServerError(w, r, err)
+		return
+	}
 
 	if err := utils.ReadJSON(w, r, &payload); err != nil {
 		utils.BadRequestError(w, r, err)
@@ -117,6 +122,8 @@ func (handler *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	if payload.Tags != nil {
 		post.Tags = *payload.Tags
 	}
+
+	post.Comments = comments
 
 	if err := handler.Service.Update(ctx, post); err != nil {
 		utils.BadRequestError(w, r, err)
@@ -153,6 +160,7 @@ func (handler *PostHandler) GetAllPost(w http.ResponseWriter, r *http.Request) {
 	for i := range posts {
 		comments, err := handler.CommentService.GetCommentByPostID(r.Context(), posts[i].ID)
 		if err != nil {
+			utils.InternalServerError(w, r, err)
 			return
 		}
 
