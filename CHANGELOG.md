@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.3.0](https://github.com/umeh-promise/blog/compare/v1.2.0...v1.3.0) (2025-01-09)
+
+
+### Features
+
+* add comment retrieval to post handler and update post model to include comments ([5be34e5](https://github.com/umeh-promise/blog/commit/5be34e527419d24b46cf460c263b748183f39cd0))
+* enhance user registration and login payloads with email validation and password handling ([aab81ee](https://github.com/umeh-promise/blog/commit/aab81eeed4e27ab6a907395ccf55752fc1d04268))
+* implement comment functionality with handler, service, repository, and model ([e200c77](https://github.com/umeh-promise/blog/commit/e200c774b218ecc86d96bdf3e6aeb33b4c933e2c))
+* integrate comment handling into post routes and restructure main application setup ([975287d](https://github.com/umeh-promise/blog/commit/975287d1fada252bba1043b2776ad87ad1df9257))
+
 ## [1.2.0](https://github.com/umeh-promise/blog/compare/v1.1.0...v1.2.0) (2025-01-09)
 
 
