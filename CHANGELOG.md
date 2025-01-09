@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/umeh-promise/blog/compare/v1.3.0...v1.4.0) (2025-01-09)
+
+
+### Features
+
+* add comment retrieval to UpdatePost and GetAllPost handlers ([96e539f](https://github.com/umeh-promise/blog/commit/96e539f59e9c3977b1942619af1b2cdb6bda5227))
+* add CORS support and configure rate limiter in main application ([9b8b1df](https://github.com/umeh-promise/blog/commit/9b8b1dfcf8a556089cbe063533d77f7aeefac48b))
+* add CORS support and rate limit exceeded response handling ([c12fc2b](https://github.com/umeh-promise/blog/commit/c12fc2bece7d194af218a3be35e46ec7efd93021))
+* add database indexes for improved query performance ([99b5fd2](https://github.com/umeh-promise/blog/commit/99b5fd25d0708c4e070ab142e210a9e878b8f491))
+* implement pagination and sorting for GetAllPost handler ([0831a5e](https://github.com/umeh-promise/blog/commit/0831a5e03cb7e94737bf250f07541c705a1af3b0))
+* implement rate limiting middleware and configuration ([eb765cc](https://github.com/umeh-promise/blog/commit/eb765cc164604d0d22d308dcb9cbd59ac05bb2dc))
+* retrieve comments for each post in GetAllPost handler ([93161af](https://github.com/umeh-promise/blog/commit/93161af0c9844c4746d037a4979c6376aa0e4937))
+
 ## [1.3.0](https://github.com/umeh-promise/blog/compare/v1.2.0...v1.3.0) (2025-01-09)
 
 
