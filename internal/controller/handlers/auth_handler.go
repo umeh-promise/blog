@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"regexp"
 
 	"github.com/umeh-promise/blog/internal/models"
 	"github.com/umeh-promise/blog/internal/utils"
@@ -81,11 +80,11 @@ type LoginUserPayload struct {
 	Password string `json:"password" validate:"required"`
 }
 
-var emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+// var emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 
-func isEmailVerified(email string) bool {
-	return emailRegex.MatchString(email)
-}
+// func isEmailVerified(email string) bool {
+// 	return emailRegex.MatchString(email)
+// }
 
 func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var payload LoginUserPayload

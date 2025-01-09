@@ -25,6 +25,14 @@ func InternalServerError(w http.ResponseWriter, r *http.Request, err error) {
 	WriteJSONError(w, http.StatusInternalServerError, []string{}, "The server encountered a problem")
 }
 
+func ForbiddenServerError(w http.ResponseWriter, r *http.Request) {
+	logger.Errorw("internal server error",
+		"method", r.Method,
+		"path", r.URL.Path,
+		"error", "forbidden")
+
+	WriteJSONError(w, http.StatusForbidden, []string{}, "Forbidden")
+}
 func BadRequestError(w http.ResponseWriter, r *http.Request, err error) {
 	logger.Errorw("bad request",
 		"method", r.Method,

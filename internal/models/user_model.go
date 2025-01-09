@@ -12,9 +12,9 @@ type User struct {
 	ProfileImage string   `json:"profile_image"`
 	Version      int64    `json:"-"`
 	Role         string   `json:"role"`
-	// Role         Role     `json:"role"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	RoleObj      Role     `json:"-"`
+	CreatedAt    string   `json:"created_at"`
+	UpdatedAt    string   `json:"updated_at"`
 }
 
 type password struct {
