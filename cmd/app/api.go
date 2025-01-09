@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/umeh-promise/blog/internal/utils"
 )
 
@@ -22,6 +23,15 @@ func (app *application) mount(routerGroups ...func(r chi.Router)) *chi.Mux {
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{utils.GetString("CORS_ALLOWED_ORIGIN", "https://localhost:4000")},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+	router.Use(app.RateLimitMiddleware)
 	router.Use(middleware.Timeout(60 * time.Second))
 
 	router.Route("/v1", func(router chi.Router) {

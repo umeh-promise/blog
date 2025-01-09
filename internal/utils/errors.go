@@ -63,3 +63,11 @@ func UnAuthorizedRequestError(w http.ResponseWriter, r *http.Request, message st
 
 	WriteJSONError(w, http.StatusUnauthorized, errors, message)
 }
+
+func RateLimitExceededResponse(w http.ResponseWriter, r *http.Request, retryAfter string) {
+	logger.Warnw("rate limit exceeded", "method", r.Method, "path", r.URL.Path)
+
+	w.Header().Set("Retry-After", retryAfter)
+
+	WriteJSONError(w, http.StatusTooManyRequests, []string{}, "rate limit exceeded, retry after: "+retryAfter)
+}
