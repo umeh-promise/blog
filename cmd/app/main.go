@@ -34,12 +34,6 @@ func main() {
 	defer db.Close()
 	logger.Info("DB connected successfully")
 
-	// Posts
-	postRepo := repositories.NewPostRepository(db)
-	postService := services.NewPostService(postRepo)
-	postHandler := handlers.NewPostHandler(postService)
-	postMiddleware := middlewares.NewPostMidleware(postService)
-
 	// Users
 	userRepo := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)
@@ -51,13 +45,24 @@ func main() {
 	roleService := services.NewRoleService(roleRepo)
 	roleMiddlware := middlewares.NewRoleMiddleware(roleService)
 
+	// Comment
+	commentRepo := repositories.NewCommentRepository(db)
+	commentService := services.NewCommentService(commentRepo)
+	commentHandler := handlers.NewCommentHandler(commentService)
+
+	// Posts
+	postRepo := repositories.NewPostRepository(db)
+	postService := services.NewPostService(postRepo)
+	postHandler := handlers.NewPostHandler(postService, commentService)
+	postMiddleware := middlewares.NewPostMidleware(postService)
+
 	app := &application{
 		config: config,
 		logger: logger,
 	}
 
 	router := app.mount(
-		routes.PostRouter(postHandler, postMiddleware, authMiddleware, roleMiddlware),
+		routes.PostRouter(postHandler, commentHandler, postMiddleware, authMiddleware, roleMiddlware),
 		routes.UserRouter(userHandler, authMiddleware),
 	)
 	logger.Fatal(app.run(router))
