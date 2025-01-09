@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.2.0](https://github.com/umeh-promise/blog/compare/v1.1.0...v1.2.0) (2025-01-09)
+
+
+### Features
+
+* add constants for token expiration, issuer, and authentication secret ([ca1f478](https://github.com/umeh-promise/blog/commit/ca1f4784cb49fb596ab2f30e25f21528a723841d))
+* add error handling for duplicate email and username, and unauthorized request logging ([b9ed2d7](https://github.com/umeh-promise/blog/commit/b9ed2d743d3faac47751545491493ba8c24017d8))
+* add JWT utility functions for token generation and validation ([50019d7](https://github.com/umeh-promise/blog/commit/50019d7c02dae843f4b1f4224fa5f89fdbe364bf))
+* add role management interface and repository implementation ([338d7b0](https://github.com/umeh-promise/blog/commit/338d7b0f2bd241bbc19f8dd1b52dc34f0dbe9883))
+* add user roles management and versioning to users table ([2d41d98](https://github.com/umeh-promise/blog/commit/2d41d9875f60c9c3d7f8566a57ad6e08d1f10ea5))
+* enhance user model with role object and add forbidden error handling ([9c1f5c8](https://github.com/umeh-promise/blog/commit/9c1f5c829f9c1d707ecdd522044185d7f41e39ee))
+* implement role management middleware and service for post ownership checks ([0f68bc3](https://github.com/umeh-promise/blog/commit/0f68bc3cb468fa7045434fc0cc4e17e808ee79b5))
+* implement user management functionality with CRUD operations ([03e36e7](https://github.com/umeh-promise/blog/commit/03e36e7a7109058491362f4920e3e2010d6e6714))
+* implement user registration and login handlers with JWT authentication ([c91e0b0](https://github.com/umeh-promise/blog/commit/c91e0b0f282da985e8f49a9335b73eb0acd9bff6))
+* refactor post handler and middleware for user context integration ([18f4541](https://github.com/umeh-promise/blog/commit/18f4541451f285298eebce0d1d3af296efac80b2))
+
 ## [1.1.0](https://github.com/umeh-promise/blog/compare/v1.0.0...v1.1.0) (2025-01-08)
 
 
