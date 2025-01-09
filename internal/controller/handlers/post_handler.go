@@ -15,7 +15,7 @@ type PostHandler struct {
 	Service *services.PostService
 }
 
-func NewUserHandler(service *services.PostService) *PostHandler {
+func NewPostHandler(service *services.PostService) *PostHandler {
 	return &PostHandler{
 		Service: service,
 	}
@@ -40,13 +40,13 @@ func (handler *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := int64(1)
+	user := middlewares.GetUserFromContext(r)
 
 	post := &models.Post{
 		Title:   payload.Title,
 		Content: payload.Content,
 		Tags:    payload.Tags,
-		UserID:  userID,
+		UserID:  user.ID,
 	}
 
 	ctx := r.Context()

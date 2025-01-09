@@ -99,37 +99,6 @@ func (repo *PostRepository) GetAll(ctx context.Context) ([]models.Post, error) {
 	return posts, nil
 }
 
-// func (postRepo *PostRepository) GetByEmail(ctx context.Context, email string) (*models.Post, error) {
-// 	var post models.Post
-
-// 	query := `SELECT id, user_id, title, content, tags, version, created_at, updated_at FROM posts WHERE email=$1`
-
-// 	ctx, cancel := context.WithTimeout(ctx, utils.QueryTimeout)
-// 	defer cancel()
-
-// 	err := postRepo.db.QueryRowContext(ctx, query, email).Scan(
-// 		&post.ID,
-// 		&post.UserID,
-// 		&post.Title,
-// 		&post.Content,
-// 		pq.Array(&post.Tags),
-// 		&post.Version,
-// 		&post.CratedAt,
-// 		&post.UpdatedAt,
-// 	)
-
-// 	if err != nil {
-// 		switch {
-// 		case errors.Is(err, sql.ErrNoRows):
-// 			return nil, utils.ErrorNotFound
-// 		default:
-// 			return nil, err
-// 		}
-// 	}
-
-// 	return &post, nil
-// }
-
 func (postRepo *PostRepository) Update(ctx context.Context, post *models.Post) error {
 	query := `
 		UPDATE posts 
@@ -170,7 +139,7 @@ func (postRepo *PostRepository) Delete(ctx context.Context, id int64) error {
 		return err
 	}
 
-	if row < 1 {
+	if row <= 0 {
 		return utils.ErrorNotFound
 	}
 

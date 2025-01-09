@@ -11,7 +11,7 @@ import (
 	"github.com/umeh-promise/blog/internal/utils"
 )
 
-type Middleware struct {
+type PostMiddleware struct {
 	Service *services.PostService
 }
 
@@ -19,13 +19,13 @@ type postKey string
 
 const postCtx postKey = "post"
 
-func NewPostMidleware(service *services.PostService) *Middleware {
-	return &Middleware{
+func NewPostMidleware(service *services.PostService) *PostMiddleware {
+	return &PostMiddleware{
 		Service: service,
 	}
 }
 
-func (middleware *Middleware) PostMiddleware(next http.Handler) http.Handler {
+func (middleware *PostMiddleware) PostMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil || id <= 0 {
