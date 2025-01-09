@@ -73,22 +73,42 @@ func (postRepo *PostRepository) GetByID(ctx context.Context, id int64) (*models.
 	return &post, nil
 }
 
-func (repo *PostRepository) GetAll(ctx context.Context) ([]models.Post, error) {
-	query := `
-		SELECT id, user_id, title, content, tags, version, created_at, updated_at FROM posts
-	`
+func (repo *PostRepository) GetAll(ctx context.Context, postQuery models.PostPaginationQuery) ([]models.PostWithCount, error) {
 
-	rows, err := repo.db.QueryContext(ctx, query)
+	query := `
+		SELECT p.id, p.user_id, p.title, p.content, p.tags, p.version, p.created_at, p.updated_at, u.username, u.first_name, u.last_name, COUNT(c.id) comments_count FROM posts p
+		LEFT JOIN comments c ON c.post_id = p.id
+		LEFT JOIN users u ON u.id = p.user_id
+		WHERE  (p.title ILIKE '%' || $3 || '%' OR p.content ILIKE '%' || $3 || '%') OR (p.tags @> $4 OR $4 = '{}')
+		GROUP BY p.id, u.username, u.first_name, u.last_name
+		ORDER BY p.created_at ` + postQuery.Sort + `
+		LIMIT $1 OFFSET $2
+		`
+
+	rows, err := repo.db.QueryContext(ctx, query, postQuery.Limit, postQuery.Offset, postQuery.Search, pq.Array(postQuery.Tags))
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var posts []models.Post
+	var posts []models.PostWithCount
 
 	for rows.Next() {
-		post := models.Post{}
-		err := rows.Scan(&post.ID, &post.UserID, &post.Title, &post.Content, pq.Array(&post.Tags), &post.Version, &post.CreatedAt, &post.UpdatedAt)
+		post := models.PostWithCount{}
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.Title,
+			&post.Content,
+			pq.Array(&post.Tags),
+			&post.Version,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+			&post.User.Username,
+			&post.User.FirstName,
+			&post.User.LastName,
+			&post.CommentsCount,
+		)
 		if err != nil {
 			return nil, err
 		}

@@ -155,7 +155,23 @@ func (handler *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *PostHandler) GetAllPost(w http.ResponseWriter, r *http.Request) {
-	posts, err := handler.Service.GetAll(r.Context())
+
+	postQuery := models.PostPaginationQuery{
+		Limit:  20,
+		Offset: 0,
+		Sort:   "desc",
+	}
+
+	postQuery, err := postQuery.Parse(r)
+	if err != nil {
+		utils.BadRequestError(w, r, err)
+		return
+	}
+	posts, err := handler.Service.GetAll(r.Context(), postQuery)
+	if err != nil {
+		utils.NotFoundResponse(w, r, err)
+		return
+	}
 
 	for i := range posts {
 		comments, err := handler.CommentService.GetCommentByPostID(r.Context(), posts[i].ID)
@@ -165,11 +181,6 @@ func (handler *PostHandler) GetAllPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		posts[i].Comments = comments
-	}
-
-	if err != nil {
-		utils.NotFoundResponse(w, r, err)
-		return
 	}
 
 	if err := utils.JSONResponse(w, http.StatusOK, posts); err != nil {

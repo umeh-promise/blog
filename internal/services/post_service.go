@@ -33,6 +33,6 @@ func (service *PostService) Delete(ctx context.Context, id int64) error {
 	return service.Repo.Delete(ctx, id)
 }
 
-func (service *PostService) GetAll(ctx context.Context) ([]models.Post, error) {
-	return service.Repo.GetAll(ctx)
+func (service *PostService) GetAll(ctx context.Context, postQuery models.PostPaginationQuery) ([]models.PostWithCount, error) {
+	return service.Repo.GetAll(ctx, postQuery)
 }
