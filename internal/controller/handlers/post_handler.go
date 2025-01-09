@@ -149,6 +149,16 @@ func (handler *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 
 func (handler *PostHandler) GetAllPost(w http.ResponseWriter, r *http.Request) {
 	posts, err := handler.Service.GetAll(r.Context())
+
+	for i := range posts {
+		comments, err := handler.CommentService.GetCommentByPostID(r.Context(), posts[i].ID)
+		if err != nil {
+			return
+		}
+
+		posts[i].Comments = comments
+	}
+
 	if err != nil {
 		utils.NotFoundResponse(w, r, err)
 		return
