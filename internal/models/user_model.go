@@ -22,7 +22,7 @@ type password struct {
 	Hash []byte
 }
 
-func (p *password) Set(text string) error {
+func (p *password) HashPassword(text string) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(text), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -32,4 +32,8 @@ func (p *password) Set(text string) error {
 	p.text = &text
 
 	return nil
+}
+
+func (p *password) CheckPassword(password string) error {
+	return bcrypt.CompareHashAndPassword(p.Hash, []byte(password))
 }

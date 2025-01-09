@@ -8,7 +8,7 @@ import (
 )
 
 type RegisterUserPayload struct {
-	Email     string `json:"email" validate:"required"`
+	Email     string `json:"email" validate:"required,email"`
 	FirstName string `json:"first_name" validate:"required,min=2"`
 	LastName  string `json:"last_name" validate:"required,min=2"`
 	Username  string `json:"username" validate:"required,min=2"`
@@ -40,7 +40,7 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		Role:      "user",
 	}
 
-	if err := user.Password.Set(payload.Password); err != nil {
+	if err := user.Password.HashPassword(payload.Password); err != nil {
 		utils.InternalServerError(w, r, err)
 		return
 	}
@@ -76,15 +76,9 @@ func (handler *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 type LoginUserPayload struct {
-	Email    string `json:"email" validate:"required"`
+	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
-
-// var emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-
-// func isEmailVerified(email string) bool {
-// 	return emailRegex.MatchString(email)
-// }
 
 func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var payload LoginUserPayload
@@ -108,6 +102,11 @@ func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		default:
 			utils.InternalServerError(w, r, err)
 		}
+		return
+	}
+
+	if err := user.Password.CheckPassword(payload.Password); err != nil {
+		utils.UnAuthorizedRequestError(w, r, "unauthorized")
 		return
 	}
 
