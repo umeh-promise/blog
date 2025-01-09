@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	_ "github.com/lib/pq"
 	"github.com/umeh-promise/blog/internal/controller/handlers"
 	"github.com/umeh-promise/blog/internal/controller/middlewares"
@@ -21,6 +23,10 @@ func main() {
 			maxOpenConn: utils.GetInt("DB_MAX_OPEN_CONNS", 30),
 			maxIdleConn: utils.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime: utils.GetString("DB_MAX_IDLE_TIME", "15m"),
+		},
+		rateLimitter: middlewares.RateLimitterConfig{
+			RequestPerTimeFrame: utils.GetInt("RATELIMITER_REQUEST_COUNT", 20),
+			TimeFrame:           time.Second * 5,
 		},
 	}
 
@@ -56,9 +62,15 @@ func main() {
 	postHandler := handlers.NewPostHandler(postService, commentService)
 	postMiddleware := middlewares.NewPostMidleware(postService)
 
+	// Rate limiter
+	rateLimiter := middlewares.NewFixedWindowLimiter(
+		config.rateLimitter.RequestPerTimeFrame, config.rateLimitter.TimeFrame,
+	)
+
 	app := &application{
-		config: config,
-		logger: logger,
+		config:       config,
+		logger:       logger,
+		rateLimitter: rateLimiter,
 	}
 
 	router := app.mount(
