@@ -46,13 +46,18 @@ func main() {
 	userHandler := handlers.NewUserHandler(userService)
 	authMiddleware := middlewares.NewAuthMiddleware(userService)
 
+	// Role
+	roleRepo := repositories.NewRoleRepository(db)
+	roleService := services.NewRoleService(roleRepo)
+	roleMiddlware := middlewares.NewRoleMiddleware(roleService)
+
 	app := &application{
 		config: config,
 		logger: logger,
 	}
 
 	router := app.mount(
-		routes.PostRouter(postHandler, postMiddleware, authMiddleware),
+		routes.PostRouter(postHandler, postMiddleware, authMiddleware, roleMiddlware),
 		routes.UserRouter(userHandler, authMiddleware),
 	)
 	logger.Fatal(app.run(router))
