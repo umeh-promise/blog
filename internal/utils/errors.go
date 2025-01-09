@@ -7,10 +7,13 @@ import (
 	"go.uber.org/zap"
 )
 
+var logger = zap.Must(zap.NewProduction()).Sugar()
+
 var (
-	ErrorNotFound  = errors.New("resource not found")
-	ErrorInvalidID = errors.New("invalid post id")
-	logger         = zap.Must(zap.NewProduction()).Sugar()
+	ErrorNotFound          = errors.New("resource not found")
+	ErrorInvalidID         = errors.New("invalid post id")
+	ErrorDuplicateEmail    = errors.New("a user with that email already exists")
+	ErrorDuplicateUsername = errors.New("a user with that username already exists")
 )
 
 func InternalServerError(w http.ResponseWriter, r *http.Request, err error) {
@@ -40,4 +43,15 @@ func NotFoundResponse(w http.ResponseWriter, r *http.Request, err error) {
 		"error", err.Error())
 
 	WriteJSONError(w, http.StatusNotFound, []string{}, "not found")
+}
+
+func UnAuthorizedRequestError(w http.ResponseWriter, r *http.Request, message string) {
+	logger.Errorw("unauthorized request",
+		"method", r.Method,
+		"path", r.URL.Path,
+		"error", message)
+
+	errors := []string{}
+
+	WriteJSONError(w, http.StatusUnauthorized, errors, message)
 }
