@@ -1,4 +1,4 @@
-include .env
+include .envrc
 MIGRATIONS_PATH=./migrations
 
 
