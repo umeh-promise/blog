@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/umeh-promise/blog/compare/v1.4.0...v1.5.0) (2025-01-10)
+
+
+### Features
+
+* update environment configuration and add Docker support ([7178d59](https://github.com/umeh-promise/blog/commit/7178d597afa0d1a29e9016aa93d44b1ce751d9bf))
+
+
+### Bug Fixes
+
+* update Dockerfile to correct output binary name and path ([fb17d78](https://github.com/umeh-promise/blog/commit/fb17d78e8a7bafcf1b81082545723a35dbe2d10f))
+* update Dockerfile to use correct application binary name ([c644867](https://github.com/umeh-promise/blog/commit/c644867aecc0a9e0613f4cb0b72c1efab2ba4e3d))
+
 ## [1.4.0](https://github.com/umeh-promise/blog/compare/v1.3.0...v1.4.0) (2025-01-09)
 
 
